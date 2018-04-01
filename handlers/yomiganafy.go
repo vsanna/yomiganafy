@@ -32,8 +32,8 @@ const failure = "failure"
 
 ## レスポンスの生成
 - format: c.String / c.JSON / c.HTML
-	- [ ] 例えばファイル(pdf, img)をDLさせるには？
-	- [ ] HTMLのテンプレートの使い方は
+	- [ ] 例えばファイル(pdf, img)をDLさせるには?
+	- [ ] HTMLのテンプレートの使い方は?(c.HTMLの引数を見るとstring渡すっぽいが...)
 - status: http.StatusOK, http.StatusInternalServerError, http.StatusNotFound, ...
 - header:
 	- [ ] まだ不明

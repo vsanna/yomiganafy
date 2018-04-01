@@ -17,7 +17,7 @@ func init() {
 
 	// routes
 	e.GET("/", handlers.Root())
-	e.GET("/yomiganafy", handlers.Yomiganafy())
+	e.GET("/yomiganafy", handlers.Yomiganafy()) // TODO: developmentでだけ有効化したい
 	e.POST("/yomiganafy", handlers.Yomiganafy())
 
 	// GAEのため、/ で受け取った処理をinit関数でeにわたす

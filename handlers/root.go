@@ -7,6 +7,6 @@ import (
 
 func Root() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "Root")
+		return c.HTML(http.StatusOK, "<a href='https://github.com/vsanna/yomiganafy'>how to use(github)</a>")
 	}
 }
