@@ -1,9 +1,15 @@
 https://yomiganafy.appspot.com/yomiganafy?name=山田健二
 
+## setup
+- さいしんのgcloudをいれる
+- dev_appserver.py app/app.yaml てlocal server が起動する
 
-gaeのデプロイでimportを解決する際に、vendorは見ない
-app.yamlのディレクトリ配下とGOPATH以下
 
+## よくあるもんたい
+
+
+
+## memo
 
 gcloudをいれるとdev_appserver.pyがinstallされ、そこへのパスが通される
 `$ dev_appserver.py app.yaml` だけでいい。もしsetupないと言われたらpython2系にする
