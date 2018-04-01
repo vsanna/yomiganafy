@@ -1,3 +1,6 @@
+https://yomiganafy.appspot.com/yomiganafy?name=山田健二
+
+
 gaeのデプロイでimportを解決する際に、vendorは見ない
 app.yamlのディレクトリ配下とGOPATH以下
 
