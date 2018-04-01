@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"github.com/labstack/echo"
 
-	"github.com/bluele/mecab-golang"
+	"github.com/ikawaha/kagome.ipadic/tokenizer"
 	"strings"
 	"fmt"
+	"log"
 )
 
 // json: jsonでdataを受け取ったときに底からparseする
@@ -19,6 +20,8 @@ import (
 type YomiganafyParams struct {
 	Name string `json:"name" form:"name" query:"name"` // {name: 'hoge'} でpostを受け付ける
 }
+
+const failure = "failure"
 
 /*
 ## リクエストの解釈
@@ -49,7 +52,15 @@ func Yomiganafy() echo.HandlerFunc {
 		}
 
 		// ここでparamsを元にビジネスロジックを実行
+		//yomigana := &Yomigana{Name: "name", Yomi: "yomi"}
 		yomigana := yomiganafy(params.Name)
+
+		// @TODO 上手いハンドリング
+		if yomigana.Yomi == failure {
+
+		}
+
+		fmt.Println(yomigana)
 
 		return c.JSON(http.StatusOK, map[string]interface{}{"result": yomigana})
 	}
@@ -75,40 +86,53 @@ func yomiganafy(name string) *Yomigana {
 	}
 }
 
-
 func parse(name string) string {
-	m, err := mecab.New("-Owakati")
-	if err != nil {
-		panic(err) // TODO: echoのraise errorどうやるのか
-	}
-	defer m.Destroy()
+	t := tokenizer.New()
+	tokens := t.Tokenize(name)
 
-	tg, err := m.NewTagger()
-	if err != nil {
-		panic(err)
-	}
-	defer tg.Destroy()
+	result := make(MyArray, 0)
 
-	lt, err := m.NewLattice(name)
-	if err != nil {
-		panic(err)
-	}
-	defer lt.Destroy()
+	for _, token := range tokens {
+		features := token.Features()
+		log.Println("token: ", token)
+		log.Println("features: ", features)
 
-	result := make([]string, 0)
-
-	node := tg.ParseToNode(lt)
-	for {
-		feature := strings.Split(node.Feature(), ",")
-		if feature[0] == "名詞" {
-			fmt.Println("surface: ", node.Surface())
-			fmt.Println("feature: ", node.Feature())
-			result = append(result, feature[7]) // @NOTE 7番目が読み. (8番目は口語の読み)
+		// BOS: Begin Of Sentence, EOS: End Of Sentence.
+		// これskipしないとうごかない。ようわからん
+		if token.Class == tokenizer.DUMMY {
+			continue
 		}
-		if node.Next() != nil {
-			break
+
+		if features[0] == "名詞" {
+			// ヨミがない場合はそもそもlenすら異なる。
+			if len(features) < 8 {
+				result = append(result, failure)
+			} else {
+				fmt.Println("surface: ", token.Surface)
+				fmt.Println("feature: ", token.Features())
+				result = append(result, features[7]) // @NOTE 7番目が読み. (8番目は口語の読み)
+			}
 		}
 	}
 
-	return strings.Join(result, " ")
+	if result.contains(failure) {
+		return failure
+	}
+
+	result_as_string := make([]string, len(result))
+	for i, arg := range result { result_as_string[i] = arg.(string) }
+	return strings.Join(result_as_string, " ")
+}
+
+
+type MyArray []interface{}
+
+func (arr MyArray) contains(el interface{}) bool {
+	for _, val := range arr {
+		if val == el {
+			return true
+		}
+	}
+
+	return false
 }
